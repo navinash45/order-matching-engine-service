@@ -1,0 +1,4 @@
+com\order\engine\service\impl\OrderServiceImplTest.class
+com\order\engine\repository\impl\H2OrderRepositoryTest.class
+com\order\engine\OrderMatchingEngineServiceApplicationTests.class
+com\order\engine\repository\impl\JavaCollectionOrderRepositoryTest.class
