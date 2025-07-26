@@ -3,9 +3,13 @@ package com.order.engine.repository.impl;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Repository;
 
+import com.order.engine.config.OrderMetrics;
 import com.order.engine.constants.OrderStatus;
 import com.order.engine.constants.OrderType;
 import com.order.engine.dto.OrderDto;
@@ -21,12 +25,17 @@ public class H2OrderRepository implements OrderRepository {
 
 	private final H2JPAOrderRepository orderRepository;
 
+	@Autowired
+	private OrderMetrics orderMetrics;
+
 	public H2OrderRepository(H2JPAOrderRepository orderRepository) {
 		this.orderRepository = orderRepository;
 	}
 
 	@Override
+	@CacheEvict(value = { "ordersById", "ordersBySymbol" }, allEntries = true)
 	public OrderDto addOrder(Order order) {
+		orderMetrics.recordOrder(order.getOrderType());
 		OrderEntity orderEntity = OrderMapper.mapToEntity(order);
 		matchOrder(orderEntity);
 		orderEntity = orderRepository.save(orderEntity);
@@ -34,6 +43,7 @@ public class H2OrderRepository implements OrderRepository {
 	}
 
 	@Override
+	@Cacheable(value = "ordersBySymbol", key = "#symbol")
 	public List<OrderDto> getOrdersBySymbol(String symbol) {
 		List<OrderEntity> orders = orderRepository.findBySymbolAndIsCompletedFalse(symbol);
 		if (orders.isEmpty()) {
@@ -43,6 +53,7 @@ public class H2OrderRepository implements OrderRepository {
 	}
 
 	@Override
+	@Cacheable(value = "ordersById", key = "#id")
 	public OrderDto getOrderById(String id) {
 		return orderRepository.findById(id).map(OrderMapper::mapToDto)
 				.orElseThrow(() -> new OrderNotFoundException("No orders found for this ID:" + id));
@@ -68,7 +79,7 @@ public class H2OrderRepository implements OrderRepository {
 
 			updateStatus(existing);
 			updateStatus(newOrder);
-
+			orderMetrics.recordMatch();
 			orderRepository.save(existing);
 		}
 
