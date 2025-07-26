@@ -6,7 +6,7 @@ import com.order.engine.dto.OrderDto;
 import com.order.engine.dto.OrderRequest;
 import com.order.engine.entity.Order;
 import com.order.engine.repository.OrderRepository;
-import com.order.enginer.service.OrderService;
+import com.order.engine.service.OrderService;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

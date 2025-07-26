@@ -1,0 +1,110 @@
+{
+	"info": {
+		"_postman_id": "5ce831a5-6db8-4db3-971d-6919c6116159",
+		"name": "OrderMatchEngine",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "46097322",
+		"_collection_link": "https://avinashnarisetty-6636949.postman.co/workspace/Avinash-Narisetty's-Workspace~d611131e-9c1e-4f20-836d-af2b8ce9d710/collection/46097322-5ce831a5-6db8-4db3-971d-6919c6116159?action=share&source=collection_link&creator=46097322"
+	},
+	"item": [
+		{
+			"name": "AddOrder",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"symbol\":\"AAPL\",\r\n    \"price\":200,\r\n    \"quantity\":2,\r\n    \"type\":\"SELL\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/apis/v1/orders",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"apis",
+						"v1",
+						"orders"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GetByOderID",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "text"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/apis/v1/orders/symbol/AAPL",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"apis",
+						"v1",
+						"orders",
+						"symbol",
+						"AAPL"
+					]
+				},
+				"description": "Generated from cURL: curl  --location 'https://localhost:8080/apis/v1/orders/' \\\r\n--header 'Content-Type: application/json' \\\r\n--data '{\r\n    \"symbol\":\"AAPL\",\r\n    \"price\":200,\r\n    \"quantity\":100,\r\n    \"type\":\"BUY\"\r\n}'"
+			},
+			"response": []
+		},
+		{
+			"name": "GetBySymbol",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/apis/v1/orders/symbol/AAPL",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"apis",
+						"v1",
+						"orders",
+						"symbol",
+						"AAPL"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

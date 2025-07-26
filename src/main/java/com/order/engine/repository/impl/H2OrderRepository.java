@@ -13,7 +13,7 @@ import com.order.engine.entity.Order;
 import com.order.engine.entity.OrderEntity;
 import com.order.engine.exception.OrderNotFoundException;
 import com.order.engine.repository.OrderRepository;
-import com.order.enginer.util.OrderMapper;
+import com.order.engine.util.OrderMapper;
 
 @Repository
 @Profile("!collection")

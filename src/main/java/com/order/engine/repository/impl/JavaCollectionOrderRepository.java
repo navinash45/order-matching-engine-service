@@ -3,18 +3,26 @@ package com.order.engine.repository.impl;
 import java.util.List;
 import java.util.PriorityQueue;
 import java.util.concurrent.ConcurrentHashMap;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Repository;
 
+import com.order.engine.config.OrderMetrics;
 import com.order.engine.dto.OrderDto;
 import com.order.engine.entity.Order;
 import com.order.engine.exception.OrderNotFoundException;
 import com.order.engine.repository.OrderRepository;
-import com.order.enginer.util.OrderMapper;
+import com.order.engine.util.OrderMapper;
 
 @Repository
 @Profile("!db")
 public class JavaCollectionOrderRepository implements OrderRepository {
+
+	@Autowired
+	private OrderMetrics orderMetrics;
 
 	private final ConcurrentHashMap<String, Order> allOrders = new ConcurrentHashMap<>();
 
@@ -52,7 +60,8 @@ public class JavaCollectionOrderRepository implements OrderRepository {
 
 			updateStatus(newOrder);
 			updateStatus(topOrder);
-
+			orderMetrics.recordMatch();
+			
 			if (topOrder.getRemainingQuantity() == 0) {
 				oppositeQueue.poll();
 			}
@@ -73,6 +82,7 @@ public class JavaCollectionOrderRepository implements OrderRepository {
 		}
 	}
 
+	@Cacheable(value = "ordersById", key = "#id")
 	@Override
 	public OrderDto getOrderById(String id) {
 		return allOrders.entrySet().stream().filter(e -> id.equalsIgnoreCase(e.getKey()))
@@ -80,6 +90,7 @@ public class JavaCollectionOrderRepository implements OrderRepository {
 				.orElseThrow(() -> new OrderNotFoundException("No orders found for this ID:" + id));
 	}
 
+	@Cacheable(value = "ordersBySymbol", key = "#symbol")
 	@Override
 	public List<OrderDto> getOrdersBySymbol(String symbol) {
 		List<OrderDto> matchingOrders = allOrders.values().stream().filter(e -> symbol.equalsIgnoreCase(e.getSymbol()))
@@ -91,8 +102,9 @@ public class JavaCollectionOrderRepository implements OrderRepository {
 	}
 
 	@Override
+	@CacheEvict(value = { "ordersById", "ordersBySymbol" }, allEntries = true)
 	public synchronized OrderDto addOrder(Order newOrder) {
-		
+		orderMetrics.recordOrder(newOrder.getOrderType());
 		matchOrders(newOrder);
 		allOrders.put(newOrder.getId(), newOrder);
 		if (newOrder.getRemainingQuantity() > 0) {
